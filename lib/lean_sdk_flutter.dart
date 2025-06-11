@@ -6,6 +6,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/gestures.dart';
 
 import 'lean_logger.dart';
 import 'lean_types.dart';
@@ -32,6 +33,7 @@ class Lean extends StatefulWidget {
   final String? customerId;
   final String? customerName;
   final String? reconnectId;
+  final String? consentId;
   final bool? showBalances;
   final LeanCallback? callback;
   final String? bankIdentifier;
@@ -75,6 +77,7 @@ class Lean extends StatefulWidget {
         accountId = null,
         reconnectId = null,
         customerName = null,
+        consentId = null,
         showBalances = null,
         paymentSourceId = null,
         paymentIntentId = null,
@@ -101,6 +104,7 @@ class Lean extends StatefulWidget {
         accessFrom = null,
         permissions = null,
         customerName = null,
+        consentId = null,
         showBalances = null,
         bankIdentifier = null,
         paymentSourceId = null,
@@ -136,6 +140,7 @@ class Lean extends StatefulWidget {
         permissions = null,
         customerName = null,
         reconnectId = null,
+        consentId = null,
         showBalances = null,
         bankIdentifier = null,
         paymentIntentId = null,
@@ -168,6 +173,7 @@ class Lean extends StatefulWidget {
         permissions = null,
         customerName = null,
         reconnectId = null,
+        consentId = null,
         showBalances = null,
         paymentIntentId = null,
         initializationUrl = '';
@@ -198,6 +204,7 @@ class Lean extends StatefulWidget {
         permissions = null,
         customerName = null,
         reconnectId = null,
+        consentId = null,
         showBalances = null,
         bankIdentifier = null,
         paymentIntentId = null,
@@ -229,6 +236,7 @@ class Lean extends StatefulWidget {
         reconnectId = null,
         permissions = null,
         customerName = null,
+        consentId = null,
         bankIdentifier = null,
         paymentSourceId = null,
         initializationUrl = '',
@@ -259,10 +267,42 @@ class Lean extends StatefulWidget {
         paymentDestinationId = null,
         accountId = null,
         reconnectId = null,
+        consentId = null,
         showBalances = null,
         paymentSourceId = null,
         paymentIntentId = null,
         initializationUrl = '';
+
+  const Lean.authorizeConsent({
+    super.key,
+    required this.appToken,
+    required this.customerId,
+    required this.consentId,
+    required this.failRedirectUrl,
+    required this.successRedirectUrl,
+    this.callback,
+    this.accessToken,
+    this.customization,
+    this.actionCancelled,
+    this.isSandbox = true,
+    this.showLogs = false,
+    this.version = 'latest',
+    this.env = 'production',
+    this.country = LeanCountry.ae,
+    this.language = LeanLanguage.en,
+  })  : _method = LeanMethods.authorizeConsent,
+        accessTo = null,
+        accessFrom = null,
+        reconnectId = null,
+        permissions = null,
+        customerName = null,
+        bankIdentifier = null,
+        paymentSourceId = null,
+        paymentIntentId = null,
+        accountId = null,
+        showBalances = null,
+        initializationUrl = '',
+        paymentDestinationId = null;
 
   @override
   State<Lean> createState() => _LeanState();
@@ -350,6 +390,15 @@ class _LeanState extends State<Lean> {
         accessToken: widget.accessToken);
   }
 
+  String get _authorizeConsent {
+    return _leanSdk.authorizeConsent(
+        customerId: widget.customerId!,
+        consentId: widget.consentId!,
+        failRedirectUrl: widget.failRedirectUrl!,
+        successRedirectUrl: widget.successRedirectUrl!,
+        accessToken: widget.accessToken);
+  }
+
   String get _initializationUrl {
     switch (widget._method) {
       case LeanMethods.connect:
@@ -366,6 +415,8 @@ class _LeanState extends State<Lean> {
         return _pay;
       case LeanMethods.verifyAddress:
         return _verifyAddress;
+      case LeanMethods.authorizeConsent:
+        return _authorizeConsent;
       default:
         return '';
     }
@@ -384,6 +435,10 @@ class _LeanState extends State<Lean> {
   }
 
   late final WebViewController _controller;
+
+  static final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers = {
+    Factory(() => EagerGestureRecognizer())
+  };
 
   @override
   void initState() {
@@ -447,6 +502,9 @@ class _LeanState extends State<Lean> {
 
   @override
   Widget build(BuildContext context) {
-    return WebViewWidget(controller: _controller);
+    return WebViewWidget(
+      controller: _controller,
+      gestureRecognizers: gestureRecognizers,
+    );
   }
 }
