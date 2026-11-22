@@ -1,6 +1,5 @@
 # Code Hygiene (VLT22-12767): one grouped Dependabot PR per ecosystem per week.
-# Minor and patch updates are grouped, and all major updates are grouped into a second PR
-# that needs a closer look (changelogs, breaking changes).
+# Minor and patch updates are grouped. Major updates are off: developers take them on purpose.
 # The 7-day cooldown keeps brand-new releases out until they have been public for a week.
 # Approve with `gh pr review --approve`, then merge: `gh pr merge --auto --squash` where
 # auto-merge is enabled (it waits for the required CI check), otherwise `gh pr merge --squash`
@@ -20,6 +19,10 @@ updates:
       default-days: 7
     commit-message:
       prefix: "chore(deps)"
+    ignore:
+      # Major updates are off: developers take them on purpose.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       pub-minor-patch:
         applies-to: version-updates
@@ -27,9 +30,6 @@ updates:
       pub-security:
         applies-to: security-updates
         update-types: ["minor", "patch"]
-      pub-major:
-        applies-to: version-updates
-        update-types: ["major"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -41,6 +41,10 @@ updates:
       default-days: 7
     commit-message:
       prefix: "chore(deps)"
+    ignore:
+      # Major updates are off: developers take them on purpose.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       actions-minor-patch:
         applies-to: version-updates
@@ -48,6 +52,3 @@ updates:
       actions-security:
         applies-to: security-updates
         update-types: ["minor", "patch"]
-      actions-major:
-        applies-to: version-updates
-        update-types: ["major"]
